@@ -45,7 +45,7 @@ func Connect(dsn string, disableAutoMigration bool) (*gorm.DB, error) {
 
 	if !disableAutoMigration {
 		err := database.AutoMigrate(
-			&models.Users{},
+			&models.User{},
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error migration database: %v", err)

@@ -4,31 +4,20 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/guvanch999/evently-app/utils/exceptions"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
-type Users struct {
-	Id        uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
-	Username  string
-	Name      string
-	Password  string
-	Email     string
-	Active    int
-	CreatedAt time.Time
-	UpdatedAt time.Time
+type User struct {
+	Id                uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey" json:"id"`
+	FirstName         string    `gorm:"type:varchar(100);not null" json:"first_name"`
+	LastName          string    `gorm:"type:varchar(255);not null" json:"last_name"`
+	InstagramNickname string    `gorm:"type:varchar(100)" json:"instagram_nickname"`
+	BirthDate         time.Time `gorm:"type:timestamp" json:"birth_date"`
+	GoogleId          string    `gorm:"type:varchar(100)" json:"google_id"`
+	Email             string    `gorm:"type:varchar(100);not null;unique" json:"email"`
+	CreatedAt         time.Time `gorm:"type:timestamp;not null;default:current_timestamp" json:"created_at"`
+	UpdatedAt         time.Time `gorm:"type:timestamp;not null;default:current_timestamp" json:"updated_at"`
 }
 
-func (u *Users) TableName() string {
+func (u *User) TableName() string {
 	return "users"
-}
-
-func (u *Users) BeforeCreate(_ *gorm.DB) (err error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
-	if err != nil {
-		return exceptions.NewResponseError(exceptions.ErrBadRequest, err)
-	}
-	u.Password = string(hash)
-	return nil
 }
