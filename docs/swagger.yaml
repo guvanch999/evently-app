@@ -1,0 +1,19 @@
+basePath: /v1
+info:
+  contact:
+    email: thelaunchist@gmail.com
+    name: API Support
+  title: Project base API
+  version: "1.0"
+paths: {}
+securityDefinitions:
+  Bearer:
+    description: Bearer token is required to access the SendGoblin API. If you don't
+      have a token, please register in the system first
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
+tags:
+- description: Auth operations
+  name: Auth
