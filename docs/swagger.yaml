@@ -1,19 +1,25 @@
 basePath: /v1
 info:
   contact:
-    email: thelaunchist@gmail.com
-    name: API Support
-  title: Project base API
+    name: Guvanch D.
+    url: https://github.com/guvanch999
+  description: Events service with Google sign-in and JWT-protected endpoints.
+  license:
+    name: MIT
+  title: Evently API
   version: "1.0"
 paths: {}
 securityDefinitions:
   Bearer:
-    description: Bearer token is required to access the SendGoblin API. If you don't
-      have a token, please register in the system first
+    description: Access token from /auth/google/callback, sent as "Bearer <token>".
     in: header
     name: Authorization
     type: apiKey
 swagger: "2.0"
 tags:
-- description: Auth operations
+- description: Google OAuth2 sign-in
   name: Auth
+- description: Current user profile
+  name: Users
+- description: Events CRUD
+  name: Events

@@ -11,7 +11,7 @@ import (
 func HashString(str string) (string, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(str), bcrypt.DefaultCost)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	return string(hashed), nil

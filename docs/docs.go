@@ -10,8 +10,11 @@ const docTemplate = `{
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
         "contact": {
-            "name": "API Support",
-            "email": "thelaunchist@gmail.com"
+            "name": "Guvanch D.",
+            "url": "https://github.com/guvanch999"
+        },
+        "license": {
+            "name": "MIT"
         },
         "version": "{{.Version}}"
     },
@@ -20,7 +23,7 @@ const docTemplate = `{
     "paths": {},
     "securityDefinitions": {
         "Bearer": {
-            "description": "Bearer token is required to access the SendGoblin API. If you don't have a token, please register in the system first",
+            "description": "Access token from /auth/google/callback, sent as \"Bearer <token>\".",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
@@ -28,8 +31,16 @@ const docTemplate = `{
     },
     "tags": [
         {
-            "description": "Auth operations",
+            "description": "Google OAuth2 sign-in",
             "name": "Auth"
+        },
+        {
+            "description": "Current user profile",
+            "name": "Users"
+        },
+        {
+            "description": "Events CRUD",
+            "name": "Events"
         }
     ]
 }`
@@ -40,8 +51,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/v1",
 	Schemes:          []string{},
-	Title:            "Project base API",
-	Description:      "",
+	Title:            "Evently API",
+	Description:      "Events service with Google sign-in and JWT-protected endpoints.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
