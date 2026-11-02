@@ -1,0 +1,43 @@
+# Runs the API together with PostgreSQL.
+# Google credentials and JWT_SECRET are read from .env (see .env.example).
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: evently
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-evently}
+      POSTGRES_DB: evently
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evently -d evently"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      GO_ENV: ${GO_ENV:-development}
+      PORT: "8080"
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS:-http://localhost:3000}
+      POSTGRES_URI: postgres://evently:${POSTGRES_PASSWORD:-evently}@db:5432/evently?sslmode=disable
+      DISABLE_AUTO_MIGRATION: "false"
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      JWT_ISSUER: ${JWT_ISSUER:-evently-app}
+      JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-1h}
+      GAUTH_CLIENT_ID: ${GAUTH_CLIENT_ID:?set GAUTH_CLIENT_ID in .env}
+      GAUTH_CLIENT_SECRET: ${GAUTH_CLIENT_SECRET:?set GAUTH_CLIENT_SECRET in .env}
+      GAUTH_CLIENT_REDIRECT_URI: ${GAUTH_CLIENT_REDIRECT_URI:-http://localhost:8080/v1/auth/google/callback}
+    restart: unless-stopped
+
+volumes:
+  pgdata:

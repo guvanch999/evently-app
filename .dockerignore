@@ -1,0 +1,10 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+*.md
+LICENSE
+docker-compose.yml
+bin/
+coverage.out
