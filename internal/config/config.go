@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"path/filepath"
 
@@ -30,7 +31,31 @@ func GetConfig() *Schema {
 		log.Fatalf("Error on parsing configuration file, error: %v", err)
 	}
 
-	log.Printf("Конфигурация: %+v", cfg)
+	// Schema implements fmt.Stringer, so secrets are redacted here.
+	log.Printf("Configuration loaded: %v", cfg)
 
 	return &cfg
+}
+
+// String returns a log-safe representation of the configuration: secrets and
+// the database DSN (which usually embeds a password) are never included.
+func (s Schema) String() string {
+	return fmt.Sprintf(
+		"{Environment:%s Port:%s AppUrl:%s PostgresUri:%s DisableAutoMigration:%t SecretKeyForHash:%s "+
+			"GAuthClientId:%s GAuthClientSecret:%s GAuthRedirectUrl:%s GAuthUserInfoUrl:%s}",
+		s.Environment, s.Port, s.AppUrl, redact(s.PostgresUri), s.DisableAutoMigration, redact(s.SecretKeyForHash),
+		redact(s.GAuthClientId), redact(s.GAuthClientSecret), s.GAuthRedirectUrl, s.GAuthUserInfoUrl,
+	)
+}
+
+// GoString keeps %#v from bypassing the redaction in String.
+func (s Schema) GoString() string {
+	return "config.Schema" + s.String()
+}
+
+func redact(value string) string {
+	if value == "" {
+		return "<unset>"
+	}
+	return "<redacted>"
 }
