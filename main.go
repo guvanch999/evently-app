@@ -17,23 +17,29 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
-//	@title						Project base API
+//	@title						Evently API
 //	@version					1.0
-//	@contact.name				API Support
-//	@contact.email				thelaunchist@gmail.com
+//	@description				Events service with Google sign-in and JWT-protected endpoints.
+//	@contact.name				Guvanch D.
+//	@contact.url				https://github.com/guvanch999
+//	@license.name				MIT
 //	@BasePath					/v1
 //	@securityDefinitions.apikey	Bearer
 //	@in							header
 //	@name						Authorization
-//	@description				Bearer token is required to access the SendGoblin API. If you don't have a token, please register in the system first
+//	@description				Access token from /auth/google/callback, sent as "Bearer <token>".
 
 // @Tag.name Auth
-// @Tag.description Auth operations
+// @Tag.description Google OAuth2 sign-in
+// @Tag.name Users
+// @Tag.description Current user profile
+// @Tag.name Events
+// @Tag.description Events CRUD
 
 func main() {
 	server := cmd.NewServer()
 
-	if server.Config.Environment == "development" {
+	if server.Config.IsDevelopment() {
 		docs.SwaggerInfo.Schemes = []string{"http"}
 		docs.SwaggerInfo.Host = fmt.Sprintf("localhost:%v", server.Config.Port)
 	} else {

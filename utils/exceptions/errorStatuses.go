@@ -63,6 +63,11 @@ var (
 		Message: "Too Many Requests",
 		Details: "The user has sent too many requests in a given amount of time.",
 	}
+	ErrBadGateway = &ResponseError{
+		Code:    http.StatusBadGateway,
+		Message: "Bad Gateway",
+		Details: "An upstream service returned an invalid response.",
+	}
 )
 
 func NewResponseError(baseError *ResponseError, err error) *ResponseError {

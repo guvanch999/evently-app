@@ -10,10 +10,13 @@ import (
 
 func RegisterMiddlewares(server *cmd.Server) {
 	server.Echo.Pre(echoMiddleware.RemoveTrailingSlash())
+	server.Echo.Use(echoMiddleware.Recover())
+	server.Echo.Use(echoMiddleware.RequestID())
+	server.Echo.Use(echoMiddleware.Secure())
 	server.Echo.Use(
 		echoMiddleware.BodyLimitWithConfig(
 			echoMiddleware.BodyLimitConfig{
-				Limit: "250M",
+				Limit: "1M",
 			},
 		),
 	)
@@ -21,9 +24,7 @@ func RegisterMiddlewares(server *cmd.Server) {
 	server.Echo.Use(
 		echoMiddleware.CORSWithConfig(
 			echoMiddleware.CORSConfig{
-				AllowOrigins: []string{
-					"http://localhost:8000",
-				},
+				AllowOrigins: server.Config.CorsAllowOrigins,
 				AllowMethods: []string{
 					http.MethodGet,
 					http.MethodPut,
@@ -45,7 +46,7 @@ func RegisterMiddlewares(server *cmd.Server) {
 	server.Echo.Use(
 		echoMiddleware.LoggerWithConfig(
 			echoMiddleware.LoggerConfig{
-				Format:           "${time_custom} | ${method} ${uri} | Status: ${status} | Error: ${error} \n",
+				Format:           "${time_custom} | ${id} | ${method} ${path} | Status: ${status} | ${latency_human} | Error: ${error}\n",
 				CustomTimeFormat: "2006/01/02 15:04:05",
 			},
 		),

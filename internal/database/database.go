@@ -18,12 +18,10 @@ func Connect(dsn string, disableAutoMigration bool) (*gorm.DB, error) {
 		&gorm.Config{
 			Logger: gormLogger.Default.LogMode(gormLogger.Warn),
 			NowFunc: func() time.Time {
-				utc, _ := time.LoadLocation("")
-				return time.Now().In(utc)
+				return time.Now().UTC()
 			},
 			PrepareStmt:     false,
 			CreateBatchSize: 100,
-			Dialector:       postgres.New(postgres.Config{DSN: dsn}),
 		},
 	)
 	if err != nil {
@@ -34,24 +32,22 @@ func Connect(dsn string, disableAutoMigration bool) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	sqlDB.SetMaxIdleConns(40)
-	sqlDB.SetMaxOpenConns(200)
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(50)
 	sqlDB.SetConnMaxLifetime(time.Minute * 15)
 
-	_, err = sqlDB.Conn(context.Background())
-	if err != nil {
-		return nil, fmt.Errorf("error connection database: %v", err)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := sqlDB.PingContext(ctx); err != nil {
+		return nil, fmt.Errorf("error connecting to database: %w", err)
 	}
 
 	if !disableAutoMigration {
-		err := database.AutoMigrate(
-			&models.User{},
-		)
-		if err != nil {
-			return nil, fmt.Errorf("error migration database: %v", err)
+		if err := database.AutoMigrate(models.All()...); err != nil {
+			return nil, fmt.Errorf("error migrating database: %w", err)
 		}
 	}
 
-	log.Println("Connected to PostgresSql")
+	log.Println("Connected to PostgreSQL")
 	return database, nil
 }
